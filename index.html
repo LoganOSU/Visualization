@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Traffic Accident Visualization</title>
+		<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+		<link rel="stylesheet" href="jRange-master/jquery.range.css">
+	<script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>
+	<script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+		<script src="https://d3js.org/d3.v4.min.js"></script>
+		<script src="jRange-master/jquery.range.js"></script>
+		<style type="text/css">
+		#floating-panel {
+        position: absolute;
+        top: 340px;
+        left: 100px;
+        width: 500px;
+        height: 400px;
+        /*right : 900px;*/
+        z-index: 5;
+        background-color: #fff;
+        padding: 5px;
+        border: 1px solid #999;
+        text-align: center;
+        font-family: 'Roboto','sans-serif';
+        line-height: 30px;
+        opacity: 0.7;
+        /*border-radius: : 5px;*/
+      }
+      #floating-panel-2{
+      	position: absolute;
+        top: 300px;
+        left: 100px;
+        width: 500px;
+        height: 20px;
+        /*right : 900px;*/
+        z-index: 5;
+        background-color: #fff;
+        padding: 5px;
+        border: 1px solid #999;
+        text-align: center;
+        font-family: 'Roboto','sans-serif';
+        line-height: 30px;
+        opacity: 0.7;
+      }
+      #player{
+      	position:relative;
+      	top: 10px;
+      }
+    #map {
+        height: 100%;
+      }
+      html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+		#form_path{
+			width: 30%;
+		}
+		.slider{
+			position:absolute;
+			top:20px;
+		}
+	</style>
+	</head>
+	<body>
+
+		<nav class="navbar navbar-default" role="navigation">
+			<div class="container-fluid">
+			<div class="navbar-header">
+				<a class="navbar-brand" href="#">Traffic Accident Visualization</a>
+			</div>
+			</div>
+		</nav>
+		<div class="container">
+				<fieldset id="form_path" enabled>
+					<form>
+						<div class="form-group">
+						<legend>Select Path</legend>
+						<select class="form-control" onchange = "selectOnchange(this)" >
+							<option value = 'julia'>Julia</option>
+							<option value = 'Cindy'>Cindy</option>		
+							<option value = 'Emily'>Emily</option>
+							<option value = 'HERMINE'>Hermine</option>
+							<option value = 'Harvey'>Harvey</option>
+							<option value = 'irma'>Irma</option>
+							<option value = 'mattrew'>Mattrew</option>
+							<option value = 'Nate'>Nate</option>
+						</select>
+						</div>
+					</form>
+				</fieldset>
+		</div>
+		<div id="floating-panel-2">
+ 		 			<input type="hidden" class = "slider" id="age-slider" value="0,0" />
+    	</div>
+		<div id="floating-panel">
+ 		 		<!-- <input type="range" min="0" max="100" value="0" class="slider" id="myRange", width = "300px"> -->
+ 		 		<p> <b>Time</b>: From <span id = 'starttime'></span> to <span id = 'endtime'></span><p>
+ 		 		<p> <b>Current time: </b> <span id = 'currenttime'></span><p>
+ 		 			<select id = "speed" class="form-control"> 
+							<option value = 100>slow</option>
+							<option value = 300>medium</option>		
+							<option value = 500>fast</option>
+					</select>
+					<button id = 'player' type="button" onclick = "play()"  class="btn btn-primary btn-sm">Play</button>
+    	</div>
+		<div id="map"></div>
+		<script type="text/javascript">
+			var deltalat, deltalng, position;
+			var pre, target, count, delay;
+	        function hurricane_change(){
+	        	if(pre == target)return;
+	        	position[0] += deltalat;
+	        	position[1] += deltalng;
+	        	marker.set('position',new google.maps.LatLng(position[0],position[1]));
+	        	// console.log(pre, target, count, delay);
+	        	if(count != 10){
+	        		count++;
+	        		setTimeout(hurricane_change, delay);
+	        	}
+	        	else{
+    				i = pre + 1;
+					document.getElementById("currenttime").innerHTML = time[i];
+					current_heatmap.setMap(null);
+				  	current_heatmap = heatmap[i];
+				  	current_heatmap.setMap(map);
+				  	deltalat = (rcd[i + 1][0] - rcd[i][0]) / 10;
+				  	deltalng = (rcd[i + 1][1] - rcd[i][1]) / 10;
+				  	pre = i;
+				  	count = 0;
+				  	setTimeout(hurricane_change, delay);
+	        	}
+	        }
+	        function play(){
+	        	// console.log('here');
+        		temp = $('#age-slider').val().split(',');
+        		left = parseInt(temp[0]) - 1;
+        		right = parseInt(temp[1]);
+        		position = [rcd[left][0], rcd[left][1]];
+        		console.log(position);
+        		delay = parseInt($('#speed').val());
+        		console.log(delay);
+        		deltalat = (rcd[left + 1][0] - rcd[left][0]) / 10;
+				deltalng = (rcd[left + 1][1] - rcd[left][1]) / 10;		
+				console.log(deltalat, deltalng);
+
+				current_heatmap.setMap(null);
+				 current_heatmap = heatmap[left];
+				 current_heatmap.setMap(map);		
+				pre = left;
+				target = right;
+				count = 0;
+				hurricane_change();
+        		
+        	}
+
+				  // first = Math.floor(this.value / 10);
+				  // second = this.value % 10 / 10;
+				  
+				  // marker.set('position', new_center);
+				  // // radius.set('center',new_center);ra
+				  // // console.log([rcd[first][0] + second * (rcd[first +  1][0] - rcd[first][0]), rcd[first][1] + second * (rcd[first + 1][1] - rcd[first][1])])
+				  // // radius.radius = intensity[first] * 10000;
+				  // if(second == 0){
+				  // 	console.log(names[intensity[first]]);
+				  // 	marker.set('icon', names[intensity[first]]);
+			  	// 	output.innerHTML = time[first];						  	// console.log('jere', first);heatmap[first]);
+				  // 	current_heatmap.setMap(null);
+				  // 	current_heatmap = heatmap[first];
+				  // 	current_heatmap.setMap(map);
+				  // }
+			function clearOverlay(){
+				if(current_heatmap != null){
+					current_heatmap.setMap(null);
+					marker.set('map',null);
+				}
+				
+			}
+		        var rcd = [], path = [], intensity = [];
+		        	heatmap = [];
+		        	time = [];
+			function selectOnchange(obj){
+		       	clearOverlay();
+				$.getJSON("test.json", function(json){
+					rcd = [], path = [], intensity = [];
+		        	heatmap = [];
+		        	time = [];
+					json = json[obj.value];
+
+		        	// get the information we need:
+		        		// rcd:center's position
+		        		// time: time str
+		        		// path: ???
+		        		// intensity: intensity
+		        		// heatmap: heatmap:layer's
+		        	for (var i = 0; i < json.length; i++) {
+		        		time.push(json[i].time);
+          				rcd.push([json[i].lat,json[i].lon]);
+          				var latLng = new google.maps.LatLng(json[i].lat,json[i].lon);
+          				path.push(latLng);
+          				intensity.push(json[i].intensity);
+          				points = [];
+          				json[i].points.forEach(foreach);
+          				function foreach(item,index){
+          					points.push(new google.maps.LatLng(item[0], item[1]));
+          				}
+          				heatmap.push(
+          					new google.maps.visualization.HeatmapLayer({
+							data : points,
+							map : null
+						})
+          					);
+					};
+					var symbol = {path: google.maps.SymbolPath.CIRCLE,
+				            	scale: 8,
+				          		strokeColor: '#393'
+        					};
+        			marker = new google.maps.Marker({
+					    position: path[0],
+					    icon: 'image/ex_nhemi.png',
+					    draggable: true,
+					    map: map
+					  });
+        			names = [ 'image/ex_nhemi.png','image/ex_nhemi.png','image/td_nhemi.png','image/ts_nhemi.png']
+        			var temp = {path: google.maps.SymbolPath.CIRCLE,
+				            	scale: 5,
+				          		strokeColor: '#FFF'
+        					};
+        			
+        			$('#myRange').attr('max', 10 * (rcd.length - 1));
+        			$('#age-slider').jRange({
+	                from: 1,
+	                to: time.length,
+	                step: 1, 
+	                format: '%s',
+	                width: 480,
+	                showLabels: false,
+	                showScale: false,
+	                isRange : true,
+	                // scale : time,
+	                theme: "theme-blue",
+	                ondragend: function(){
+	                	temp = $('#age-slider').val().split(',');
+        				document.getElementById("starttime").innerHTML = time[parseInt(temp[0]) - 1];
+        				document.getElementById("endtime").innerHTML = time[parseInt(temp[1]) - 1];
+        			}
+	            });
+        			// console.log($('#age-slider').jRange())
+        			$('#age-slider').jRange('updateRange', '1,' + time.length, '1,1');
+						var output = document.getElementById("demo");
+						current_heatmap = heatmap[0];
+						current_heatmap.setMap(map);
+						
+		    	});
+			}
+ 			var map, heatmap, current_heatmap, marker;
+	        function initMap() {
+		        map = new google.maps.Map(document.getElementById('map'), {
+	          		zoom: 3.5,
+	          		center: {lat: 18, lng: -80.434},
+	          		mapTypeId: 'satellite'
+		        });
+
+	        }
+		</script>
+		<script async defer
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyARIoJbJiEYBSag0ye8-IXQ0LqV61ZpdCg&libraries=visualization&callback=initMap">
+    </script>
+	</body>
+</html>
