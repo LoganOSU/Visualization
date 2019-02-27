@@ -34,18 +34,17 @@
 		padding: 20px;*/
       	
       	position: absolute;
-        top: 300px;
-        left: 100px;
-        width: 500px;
-        height: 20px;
+        top: 100px;
+        left: 1300px;
+        width: 150px;
+        height: 150px;
         right : 900px;
-        z-index: 5;
         background-color: #fff;
         padding: 5px;
         border: 1px solid #999;
         text-align: center;
         font-family: 'Roboto','sans-serif';
-        line-height: 30px;
+        line-height: 120%;
         opacity: 0.7;
       }
       #player{
@@ -68,6 +67,9 @@
 		}
 		.margin{
 			padding:10px;
+		}
+		.small_margin{
+			padding:5px;
 		}
 	</style>
 	</head>
@@ -116,15 +118,27 @@
  		 			<p>From <span id = 'starttime'></span> to <span id = 'endtime'></span><p>
  		 			<div id = 'player'><button class="btn btn-primary btn-lg" type="button" onclick = "play()"  class="btn btn-primary btn-sm">Play</button>
 					<button class="btn btn-primary btn-lg" type="button" onclick = "stop()"  class="btn btn-primary btn-sm">Stop</button>
+					<button class="btn btn-primary btn-lg" type="button" onclick = "restart()"  class="btn btn-primary btn-sm">Restart</button>
  		 			</div>
  		 		<p> <b>Current time: </b> <span id = 'currenttime'></span><p>
 
 					
     	</div>
 		<div id="map"></div>
+		<div id='floating-panel-2'>
+			<div id='player'>
+ 		 		<legend>Local Time</legend>
+ 		 		<div id = 'localtime'></div>
+
+ 		 		<div class = 'small_margin'></div>
+				<!-- <p>Description</p> -->
+				<div id = 'timezone'></div>
+			</div>
+		</div>
 		<script type="text/javascript">
+			var json;
+
 			function transfer(time){
-				console.log(time);
 					[a, b, c, d] = time;
 					// console.log(a);
 					return b + '/' + c + '/' + a + ' ' + d +':00';
@@ -149,32 +163,51 @@
 			var current, target, count, delay;
  			var map, heatmap, current_heatmap, marker;
  			var flag = 0;
+ 			var working = 0;
  			function stop(){
  				flag = 1;
  			}
+ 			function restart(){
+ 				flag = 1;
+ 				function wait(){
+ 					flag = 0;
+ 					working = 0;
+ 				}
+ 				setTimeout(wait, 1000);
+ 			}
 	        function hurricane_change(){
 	        	if(flag == 1||current == target - 1){
-	        		flag = 0;
+	        		working = 0;
 	        		return;}
-	        	console.log(position[current]);	
         		marker.set('position',new google.maps.LatLng({lat:position[current][0], lng: position[current][1]}));
 				document.getElementById("currenttime").innerHTML = transfer(time[current]);
+				document.getElementById("localtime").innerHTML = transfer(local_time[current].slice(0, 4));
+				document.getElementById('timezone').innerHTML = local_time[current][4];
 				pre = current_heatmap;
 			  	current_heatmap = heatmap[current];
 			  	current_heatmap.setMap(map);
 			  	pre.setMap(null);
 				current += 1;
-			  	setTimeout(hurricane_change, delay);
+			  	setTimeout(hurricane_change, parseInt($('#speed').val()));
 	        }
 	        function play(){
+	        	if(flag == 1){
+	        		flag = 0;
+	        		working = 1;
+	        		hurricane_change();
+	        		return;
+	        	}
+
+	        	if(working == 1){
+	        		return;
+	        	}
+	        	working = 1;
         		temp = $('.slider').val().split(',');
-        		console.log(temp);
         		left = parseInt(temp[0]);
         		right = parseInt(temp[1]);
-        		delay = parseInt($('#speed').val());
-        		console.log(delay);
-
-				current_heatmap.setMap(null);
+        		// delay = parseInt($('#speed').val());
+        		if(current_heatmap != null)
+					current_heatmap.setMap(null);
 				 current_heatmap = heatmap[left];
 				 current_heatmap.setMap(map);		
 				// pre = left;
@@ -184,29 +217,37 @@
         		
         	}
 			function clearOverlay(){
+				restart();
+				// working = 0;
 				if(current_heatmap != null){
 				current_heatmap.setMap(null);
-				marker.set('map',null);
 				}
 
 			}
 		        var rcd = [], path = [], intensity = [];
-		        	heatmap = [];
-		        	time = [];
+		        	var heatmap = [];
+		        	var time = [], local_time = [];
 			function selectOnchange(){
 		       	clearOverlay();
-				$.getJSON("data.json", function(json){
 					// json = json;
 					// console.log(json);
+		        	if(json == null){    		
+						$.getJSON("data.json", function(data){
+							json = data;
+							selectOnchange();
+						})
+		        	}
+		        	else{
 					rcd = [], intensity = [];
 		        	heatmap = [];
 		        	time = [];
+		        	local_time = [];
 		        	position = [];
-		        	console.log($('#type').val(),$('#hurricane').val());
-		        	console.log(json[$('#type').val()]);
 					data = json[$('#type').val()][$('#hurricane').val()];
 		        	for (var i = 0; i < data.length; i++) {
+		        		// console.log
 		        		time.push(data[i].time);
+		        		local_time.push(data[i].local_time);
           				position.push(data[i].location);
           				points = [];
           				data[i].points.forEach(foreach);
@@ -227,7 +268,10 @@
 				          		strokeColor: '#393'
         					};
         			// position = data.location;
+        			if(marker != null){
+        				marker.setMap(null);
 
+        			}
         			marker = new google.maps.Marker({
 					    position: new google.maps.LatLng({lat: position[0][0], lng: position[0][1]}),
 					    icon: 'image/ex_nhemi.png',
@@ -243,12 +287,15 @@
         			$('.slider').jRange('setValue', '0, '+(time.length - 1));
 
 						var output = document.getElementById("demo");
+						console.log('here');
 						current_heatmap = heatmap[0];
 						current_heatmap.setMap(map);
+		        	}
+
 						
-		    	});
 			}
 	        function initMap() {
+
 		        map = new google.maps.Map(document.getElementById('map'), {
 	          		zoom: 4,
 	          		center: {lat: 30, lng: -90},
@@ -267,6 +314,8 @@
 	                // scale : time,
 	                theme: "theme-blue",
 	                ondragend: function(){
+						restart();
+						working = 0;
 	                	temp = $('.slider').val().split(',');
         				document.getElementById("starttime").innerHTML = transfer(time[parseInt(temp[0]) - 1]);
         				document.getElementById("endtime").innerHTML = transfer(time[parseInt(temp[1]) - 1]);
