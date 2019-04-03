@@ -71,6 +71,33 @@
 		.margin{
 			padding:10px;
 		}
+		#floating-panel-2{/*
+		float: left;
+		width: 20%;
+		height: 500px;  only for demonstration, should be removed 
+		background: #ccc;
+		padding: 20px;*/
+      	
+      	position: absolute;
+        top: 300px;
+        left: 100px;
+        width: 500px;
+        height: 20px;
+        top: 100px;
+        left: 1300px;
+        width: 150px;
+        height: 150px;
+        right : 900px;
+        z-index: 5;
+        background-color: #fff;
+        padding: 5px;
+        border: 1px solid #999;
+        text-align: center;
+        font-family: 'Roboto','sans-serif';
+        line-height: 30px;
+        line-height: 120%;
+        opacity: 0.7;
+      }
 	</style>
 	</head>
 	<body>
@@ -124,10 +151,21 @@
 					
     	</div>
 		<div id="map"></div>
+				<div id='floating-panel-2'>
+			<div id='player'>
+ 		 		<legend>Local Time</legend>
+ 		 		<div id = 'localtime'></div>
+
+ 		 		<div class = 'small_margin'></div>
+				<!-- <p>Description</p> -->
+				<div id = 'timezone'></div>
+			</div>
+
+		</div>
 		<script type="text/javascript">
  	       var gradient = [
           'rgba(0, 255, 255, 0)',
-          'rgba(0, 255, 255, 1)',
+          'rgba(255, 0,0,1)',
           'rgba(0, 191, 255, 1)',
           'rgba(0, 127, 255, 1)',
           'rgba(0, 63, 255, 1)',
@@ -162,6 +200,8 @@
 	        		return;}
         		marker.set('position',new google.maps.LatLng({lat:position[current][0], lng: position[current][1]}));
 				document.getElementById("currenttime").innerHTML = transfer(time[current]);
+				document.getElementById("localtime").innerHTML = transfer(local_time[current].slice(0, 4));
+				document.getElementById('timezone').innerHTML = local_time[current][4];
 				pre = current_heatmap;
 			  	current_heatmap = heatmap[current];
 			  	current_heatmap.setMap(map);
@@ -201,7 +241,7 @@
 
 	        var rcd = [], path = [], intensity = [], types = [];
 	        	heatmap = [];
-	        	time = [];
+	        	time = [], local_time = [];
 
 
 	       	function check(){
@@ -223,21 +263,20 @@
 					rcd = [], intensity = [];
 		        	heatmap = [];
 		        	time = [];
+		        	local_time = [];
 		        	position = [];
 					data = json[$('#hurricane').val()];
 		        	for (var i = 0; i < data.length; i++) {
 		        		time.push(data[i].time);
+
+		        		local_time.push(data[i].local_time);
           				position.push(data[i].location);
           				points = [];
-          				
           				types.forEach(
           						(type, index)=>{
           							data[i].points[type].forEach(foreach);
           						}
           					);
-          				// for(type: types){
-          					// data[i].points[type].forEach(foreach);
-          				// }
           				function foreach(item,index){
           					points.push(new google.maps.LatLng(item[0], item[1]));
           				}
