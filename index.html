@@ -71,17 +71,11 @@
 		.margin{
 			padding:10px;
 		}
-		#floating-panel-2{/*
-		float: left;
-		width: 20%;
-		height: 500px;  only for demonstration, should be removed 
-		background: #ccc;
-		padding: 20px;*/
+		#floating-panel-2{
       	
       	position: absolute;
-        top: 300px;
+        /*top: 300px;*/
         left: 100px;
-        width: 500px;
         height: 20px;
         top: 100px;
         left: 1300px;
@@ -98,7 +92,32 @@
         line-height: 120%;
         opacity: 0.7;
       }
-	</style>
+      #floating-panel-3{
+      	
+      	position: absolute;
+        /*top: 300px;*/
+        left: 100px;
+        height: 20px;
+        top: 300px;
+        left: 1300px;
+        width: 150px;
+        height: 150px;
+        right : 900px;
+        z-index: 5;
+        background-color: #fff;
+        padding: 5px;
+        border: 1px solid #999;
+        text-align: left;
+        font-family: 'Roboto','sans-serif';
+        line-height: 30px;
+        line-height: 120%;
+        opacity: 0.7;
+      }
+      #floating-panel-3 img{
+      	width:20px;
+      	height:20px;
+      }
+  	</style>
 	</head>
 	<body>
 
@@ -157,11 +176,23 @@
  		 		<div id = 'localtime'></div>
 
  		 		<div class = 'small_margin'></div>
-				<!-- <p>Description</p> -->
 				<div id = 'timezone'></div>
 			</div>
-
 		</div>
+
+		<div id='floating-panel-3'>
+			<img src = 'image/1.png'>
+			<b>Accident</b><br></br>
+
+			<img src = 'image/2.png'>
+			<b>Construction</b><br></br>		
+			<img src = 'image/3.png'>
+			<b>Event</b><br></br>
+			<img src = 'image/4.png'>
+			<b>Congestion</b><br></br>
+
+			</div>
+
 		<script type="text/javascript">
  	       var gradient = {'Incident/accident':[
           'rgba(255, 0, 255, 0)',
@@ -179,7 +210,7 @@
           'rgba(0, 191, 31, 1)',
           'rgba(0, 255, 0, 1)'
           ],
- 	       'Congestion':[
+ 	       'Construction':[
           'rgba(0, 255, 255, 0)',
           'rgba(255, 0,0,1)',
           'rgba(0, 191, 255, 1)',
@@ -250,7 +281,8 @@
 	        	if(flag == 1||current == target - 1){
 	        		flag = 0;
 	        		playing =  0;
-	        		return;}
+	        		return;
+	        	}
 	        	playing = 1;
         		marker.set('position',new google.maps.LatLng({lat:position[current][0], lng: position[current][1]}));
 				document.getElementById("currenttime").innerHTML = transfer(time[current]);
@@ -271,6 +303,7 @@
 	        }
 	        function play(){
 	        	if(playing == 1)return;
+
 	        	// console.log(current_heatmap	== null);
         		temp = $('.slider').val().split(',');
         		console.log(temp);
@@ -297,6 +330,7 @@
 
 
 			function clearOverlay(){
+				// sleep(10);
 				if(current_heatmap != null){
 				current_heatmap.forEach(function(cmap){
 			  			cmap.setMap(null);
@@ -324,6 +358,7 @@
 	       	}
 
 			function selectOnchange(){
+				stop();
 		       	clearOverlay();
 		       	if(check()){
 		       		return;
