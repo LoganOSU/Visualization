@@ -13,6 +13,7 @@
 		<script src="https://d3js.org/d3.v4.min.js"></script>
 		<script src="jRange-master/jquery.range.js"></script>
 		<style type="text/css">
+		/*csv information*/
 		#floating-panel {
 
 		float: left;
@@ -119,6 +120,7 @@
       }
   	</style>
 	</head>
+	<!-- DOM elements -->
 	<body>
 
 		<nav class="navbar navbar-default" role="navigation">
@@ -194,6 +196,8 @@
 			</div>
 
 		<script type="text/javascript">
+
+		 //pre-defined gradient chromatogram for heatmap
  	       var gradient = {'Incident/accident':[
           'rgba(255, 0, 255, 0)',
           'rgba(255, 255,0,1)',
@@ -261,23 +265,22 @@
           'rgba(0, 255, 0, 1)'
           ]}
 
-			
+			// helper functions
 			function transfer(time){
 				console.log(time);
 					[a, b, c, d] = time;
 					return b + '/' + c + '/' + a + ' ' + d +':00';
 				}
-
-			var deltalat, deltalng, position;
-			var current, target, count, delay;
- 			var map, heatmap, current_heatmap, marker;
- 			var flag = 0;
  			function stop(){
  				playing = 0;
  				flag = 1;
  			}
  			var playing = 0;
+
+
+ 			// update hurricane position and heatmap when playing
 	        function hurricane_change(){
+	        	// state check
 	        	if(flag == 1||current == target - 1){
 	        		flag = 0;
 	        		playing =  0;
@@ -293,14 +296,14 @@
 			  	current_heatmap.forEach(function(cmap){
 			  		cmap.setMap(map);
 			  	})
-			  	// current_heatmap.setMap(map);
 			  	pre.forEach(function(pmap){
 			  		pmap.setMap(null);
 			  	})
-			  	// pre.setMap(null);
 				current += 1;
 			  	setTimeout(hurricane_change, delay);
 	        }
+
+	        // function triggered when play triggered. Check the necessary information and than trigger hurricane_change function.
 	        function play(){
 	        	if(playing == 1)return;
 
@@ -328,7 +331,7 @@
         	}
 
 
-
+// Clear all DOM elements when finished.
 			function clearOverlay(){
 				// sleep(10);
 				if(current_heatmap != null){
@@ -341,6 +344,10 @@
 			}
 
 
+			var deltalat, deltalng, position;
+			var current, target, count, delay;
+ 			var map, heatmap, current_heatmap, marker;
+ 			var flag = 0;
 
 	        var rcd = [], path = [], intensity = [], types = [];
 	        	heatmap = [];
@@ -357,12 +364,14 @@
 	       		return false;
 	       	}
 
+// Triggered when information changed.
 			function selectOnchange(){
 				stop();
 		       	clearOverlay();
 		       	if(check()){
 		       		return;
 		       	}
+		       	// update data.
 				$.getJSON("data1.json", function(json){
 					rcd = [], intensity = [];
 		        	heatmap = [];
@@ -419,6 +428,8 @@
 						
 		    	});
 			}
+
+// construct google map.
 	        function initMap() {
 	        	console.log('hrer');
 		        map = new google.maps.Map(document.getElementById('map'), {
