@@ -154,9 +154,9 @@
  		 		<div class = 'margin'></div>				
  		 		<legend>Select Speed</legend>
  		 			<select id = "speed" class="form-control"> 
-							<option value = 500>slow</option>
-							<option value = 200>medium</option>		
-							<option value = 100>fast</option>
+							<option value = 500>Slow</option>
+							<option value = 200>Medium</option>		
+							<option value = 100>Fast</option>
 					</select>
  		 		<div class = 'margin'></div>						
 
@@ -164,8 +164,10 @@
  		 		<input type="hidden" class = "slider" id="age-slider"  />
  		 		<div class = 'margin'></div>
  		 			<p>From <span id = 'starttime'></span> to <span id = 'endtime'></span><p>
- 		 			<div id = 'player'><button class="btn btn-primary btn-lg" type="button" id = 'play' onclick = "play()"  class="btn btn-primary btn-sm">Play</button>
-					<button class="btn btn-primary btn-lg" type="button" onclick = "stop()" id = 'stop'  class="btn btn-primary btn-sm">Stop</button>
+ 		 			<div id = 'player'>
+ 		 				<button class="btn btn-primary btn-lg" type="button" id = 'play' onclick = "play()"  class="btn btn-primary btn-sm">Play</button>
+						<button class="btn btn-primary btn-lg" type="button" id = 'stop' onclick = "stop()" class="btn btn-primary btn-sm">Stop</button>
+ 		 				<button class="btn btn-primary btn-lg" type="button" id = 'reset' onclick = "reset()" class="btn btn-primary btn-sm">Reset</button>
  		 			</div>
  		 		<p> <b>Current time: </b> <span id = 'currenttime'></span><p>
 
@@ -197,100 +199,120 @@
 
 		<script type="text/javascript">
 
-		 //pre-defined gradient chromatogram for heatmap
- 	       var gradient = {'Incident/accident':[
-          'rgba(255, 0, 255, 0)',
-          'rgba(255, 255,0,1)',
-          'rgba(191, 0, 255, 1)',
-          'rgba(127, 0, 255, 1)',
-          'rgba(63, 0, 255, 1)',
-          'rgba(0, 0, 255, 1)',
-          'rgba(0, 0, 223, 1)',
-          'rgba(0, 0, 191, 1)',
-          'rgba(0, 0, 159, 1)',
-          'rgba(0, 0, 127, 1)',
-          'rgba(0, 63, 91, 1)',
-          'rgba(0, 127, 63, 1)',
-          'rgba(0, 191, 31, 1)',
-          'rgba(0, 255, 0, 1)'
-          ],
- 	       'Construction':[
-          'rgba(0, 255, 255, 0)',
-          'rgba(255, 0,0,1)',
-          'rgba(0, 191, 255, 1)',
-          'rgba(0, 127, 255, 1)',
-          'rgba(0, 63, 255, 1)',
-          'rgba(0, 0, 255, 1)',
-          'rgba(0, 0, 223, 1)',
-          'rgba(0, 0, 191, 1)',
-          'rgba(0, 0, 159, 1)',
-          'rgba(0, 0, 127, 1)',
-          'rgba(63, 0, 91, 1)',
-          'rgba(127, 0, 63, 1)',
-          'rgba(191, 0, 31, 1)',
-          'rgba(255, 0, 0, 1)'
-        	]
-        	,
-        	'Event':[
-          'rgba(255, 255, 0, 0)',
-          'rgba(0, 0,255,1)',
-          'rgba(255, 191, 0, 1)',
-          'rgba(255, 127, 0, 1)',
-          'rgba(255, 63, 0, 1)',
-          'rgba(255, 0, 0, 1)',
-          'rgba(223, 0, 0, 1)',
-          'rgba(191, 0, 0, 1)',
-          'rgba(159, 0, 0, 1)',
-          'rgba(127, 0, 0, 1)',
-          'rgba(91, 0, 63, 1)',
-          'rgba(63, 0, 127, 1)',
-          'rgba(31, 0, 191, 1)',
-          'rgba(0, 0, 255, 1)'
-          ]
-          ,
-          'Congestion/Flow':[
-          'rgba(255, 0, 255, 0)',
-          'rgba(0, 255,0,1)',
-          'rgba(255, 0, 191, 1)',
-          'rgba(255, 0, 127, 1)',
-          'rgba(255, 0, 63, 1)',
-          'rgba(255, 0, 0, 1)',
-          'rgba(223, 0, 0, 1)',
-          'rgba(191, 0, 0, 1)',
-          'rgba(159, 0, 0, 1)',
-          'rgba(127, 0, 0, 1)',
-          'rgba(91, 63, 0, 1)',
-          'rgba(63, 127, 0, 1)',
-          'rgba(31, 191, 0, 1)',
-          'rgba(0, 255, 0, 1)'
-          ]}
+		 	//pre-defined gradient chromatogram for heatmap
+ 	    	var gradient = {'Incident/accident':[
+        	'rgba(255, 0, 255, 0)',
+			'rgba(255, 255,0,1)',
+			'rgba(191, 0, 255, 1)',
+			'rgba(127, 0, 255, 1)',
+			'rgba(63, 0, 255, 1)',
+			'rgba(0, 0, 255, 1)',
+			'rgba(0, 0, 223, 1)',
+			'rgba(0, 0, 191, 1)',
+			'rgba(0, 0, 159, 1)',
+			'rgba(0, 0, 127, 1)',
+			'rgba(0, 63, 91, 1)',
+			'rgba(0, 127, 63, 1)',
+			'rgba(0, 191, 31, 1)',
+			'rgba(0, 255, 0, 1)'
+			],
+			   'Construction':[
+			'rgba(0, 255, 255, 0)',
+			'rgba(255, 0,0,1)',
+			'rgba(0, 191, 255, 1)',
+			'rgba(0, 127, 255, 1)',
+			'rgba(0, 63, 255, 1)',
+			'rgba(0, 0, 255, 1)',
+			'rgba(0, 0, 223, 1)',
+			'rgba(0, 0, 191, 1)',
+			'rgba(0, 0, 159, 1)',
+			'rgba(0, 0, 127, 1)',
+			'rgba(63, 0, 91, 1)',
+			'rgba(127, 0, 63, 1)',
+			'rgba(191, 0, 31, 1)',
+			'rgba(255, 0, 0, 1)'
+			]
+			,
+			'Event':[
+			'rgba(255, 255, 0, 0)',
+			'rgba(0, 0,255,1)',
+			'rgba(255, 191, 0, 1)',
+			'rgba(255, 127, 0, 1)',
+			'rgba(255, 63, 0, 1)',
+			'rgba(255, 0, 0, 1)',
+			'rgba(223, 0, 0, 1)',
+			'rgba(191, 0, 0, 1)',
+			'rgba(159, 0, 0, 1)',
+			'rgba(127, 0, 0, 1)',
+			'rgba(91, 0, 63, 1)',
+			'rgba(63, 0, 127, 1)',
+			'rgba(31, 0, 191, 1)',
+			'rgba(0, 0, 255, 1)'
+			]
+			,
+			'Congestion/Flow':[
+			'rgba(255, 0, 255, 0)',
+			'rgba(0, 255,0,1)',
+			'rgba(255, 0, 191, 1)',
+			'rgba(255, 0, 127, 1)',
+			'rgba(255, 0, 63, 1)',
+			'rgba(255, 0, 0, 1)',
+			'rgba(223, 0, 0, 1)',
+			'rgba(191, 0, 0, 1)',
+			'rgba(159, 0, 0, 1)',
+			'rgba(127, 0, 0, 1)',
+			'rgba(91, 63, 0, 1)',
+			'rgba(63, 127, 0, 1)',
+			'rgba(31, 191, 0, 1)',
+			'rgba(0, 255, 0, 1)'
+			]}
+
+          	var deltalat, deltalng, position;
+			var count, delay;
+ 			var map, heatmap, current_heatmap, marker;
+ 			var playing = 0;
+ 			var flag = 1;
+ 			var left = 0;
+ 			var right = 1000;
+ 			var current = left;
+ 			var target = right;
+
+	        var rcd = [], path = [], intensity = [], types = [];
+	        	heatmap = [];
+	        	time = [], local_time = [];
 
 			// helper functions
 			function transfer(time){
 				console.log(time);
-					[a, b, c, d] = time;
-					return b + '/' + c + '/' + a + ' ' + d +':00';
-				}
+				[a, b, c, d] = time;
+				return b + '/' + c + '/' + a + ' ' + d +':00';
+			}
+
  			function stop(){
- 				playing = 0;
+ 				console.log('Stop called');
  				flag = 1;
  			}
- 			var playing = 0;
 
+ 			// Resets the current variable to the first allowed value in the slider
+			function reset(){
+				temp = $('.slider').val().split(',');
+				current = parseInt(temp[0]);
+				updateTimes();
+ 			}
 
  			// update hurricane position and heatmap when playing
 	        function hurricane_change(){
+	        	console.log("Hurricane");
 	        	// state check
-	        	if(flag == 1||current == target - 1){
-	        		flag = 0;
-	        		playing =  0;
+	        	if(flag == 1||current > target){
+	        		playing = 0;
+ 					flag = 1;
 	        		return;
 	        	}
+
 	        	playing = 1;
         		marker.set('position',new google.maps.LatLng({lat:position[current][0], lng: position[current][1]}));
-				document.getElementById("currenttime").innerHTML = transfer(time[current]);
-				document.getElementById("localtime").innerHTML = transfer(local_time[current].slice(0, 4));
-				document.getElementById('timezone').innerHTML = local_time[current][4];
+				updateTimes();
 				pre = current_heatmap;
 			  	current_heatmap = heatmap[current];
 			  	current_heatmap.forEach(function(cmap){
@@ -305,18 +327,20 @@
 
 	        // function triggered when play triggered. Check the necessary information and than trigger hurricane_change function.
 	        function play(){
-	        	if(playing == 1)return;
+	        	console.log('Play called');
+	        	if(playing == 1){
+	        		return;
+	        	}
 
-	        	// console.log(current_heatmap	== null);
-        		temp = $('.slider').val().split(',');
-        		console.log(temp);
-        		left = parseInt(temp[0]);
-        		if(left == -1){alert('Please Select Time');return;}
-        		right = parseInt(temp[1]);
+        		if(current < left || current > right || target < left || target > right){
+        			alert('Please Select Time');
+        			return;
+        		}
+
+        		flag = 0;
         		delay = parseInt($('#speed').val());
-        		// console.log(delay);
         		if(current_heatmap != null){
-				current_heatmap.forEach(function(cmap){
+					current_heatmap.forEach(function(cmap){
 			  			cmap.setMap(null);
 			  		})
 			  	}
@@ -324,14 +348,11 @@
 				current_heatmap.forEach(function(cmap){
 			  			cmap.setMap(map);
 			  		}	)
-				// pre = left;
-				current = left;
-				target = right;
 				hurricane_change();
         	}
 
 
-// Clear all DOM elements when finished.
+			// Clear all DOM elements when finished.
 			function clearOverlay(){
 				// sleep(10);
 				if(current_heatmap != null){
@@ -343,35 +364,37 @@
 				}
 			}
 
-
-			var deltalat, deltalng, position;
-			var current, target, count, delay;
- 			var map, heatmap, current_heatmap, marker;
- 			var flag = 0;
-
-	        var rcd = [], path = [], intensity = [], types = [];
-	        	heatmap = [];
-	        	time = [], local_time = [];
-
-
 	       	function check(){
 	       		new_type = $('#type').val();
 	       		console.log(new_type);
 	       		new_hurricane = $('#hurricane').val();
-	       		if(hurricane == new_hurricane && type == new_type ) return true;
+	       		if(hurricane == new_hurricane && type == new_type ){
+	       			return true;
+	       		}
 	       		types = new_type;
 	       		hurricane = new_hurricane;
 	       		return false;
 	       	}
 
-// Triggered when information changed.
+	       	function updateTimes(){
+	     		temp = $('.slider').val().split(',');
+	       		document.getElementById("starttime").innerHTML = transfer(time[parseInt(temp[0])]);
+        		document.getElementById("endtime").innerHTML = transfer(time[parseInt(temp[1])]);
+        		document.getElementById("currenttime").innerHTML = transfer(time[current]);
+				document.getElementById("localtime").innerHTML = transfer(local_time[current].slice(0, 4));
+				document.getElementById('timezone').innerHTML = local_time[current][4];
+	       	}
+
+			// Triggered when information changed.
 			function selectOnchange(){
+				console.log('Select on change called');
 				stop();
 		       	clearOverlay();
 		       	if(check()){
 		       		return;
 		       	}
-		       	// update data.
+
+		       	// Update data.
 				$.getJSON("data1.json", function(json){
 					rcd = [], intensity = [];
 		        	heatmap = [];
@@ -381,7 +404,6 @@
 					data = json[$('#hurricane').val()];
 		        	for (var i = 0; i < data.length; i++) {
 		        		time.push(data[i].time);
-
 		        		local_time.push(data[i].local_time);
           				position.push(data[i].location);
           				points = [];
@@ -404,10 +426,8 @@
   						);
   						heatmap.push(temp_heatmap);
 					};
-					var symbol = {path: google.maps.SymbolPath.CIRCLE,
-				            	scale: 8,
-				          		strokeColor: '#393'
-        					};
+
+					var symbol = {path: google.maps.SymbolPath.CIRCLE, scale: 8, strokeColor: '#393'};
         			// position = data.location;
         			// console.log(position);
         			marker = new google.maps.Marker({
@@ -416,45 +436,46 @@
 					    draggable: true,
 					    map: map
 					  });
-        			$('.slider').jRange('updateRange', '0,' + (time.length - 1));
-        			$('.slider').jRange('setValue', '0, '+(time.length - 1));
-
-						// var output = document.getElementById("demo");
 						current_heatmap = heatmap[0];
 						current_heatmap.forEach(function(cmap){
 			  				cmap.setMap(map);
 			  			}	)
-						// current_heatmap.setMap(map);
-						
-		    	});
+
+					// Updating right updates slider data
+					right = time.length - 1;
+					// setValue changes the pointers
+	        		$('.slider').jRange('updateRange', '0,' + right, '0,' + right);
+	        		current = 0;
+	        		target = right;
+	        		updateTimes();
+			    	});
 			}
 
-// construct google map.
+			// construct google map.
 	        function initMap() {
-	        	console.log('hrer');
+	        	console.log('Map initialized');
 		        map = new google.maps.Map(document.getElementById('map'), {
 	          		zoom: 4,
 	          		center: {lat: 30, lng: -90},
 	          		mapTypeId: 'satellite'
 		        });
         			$('.slider').jRange({
-	                from: 0,
-	                to: time.length - 1,
+	                from: left,
+	                to: right,
 	                step: 1, 
 	                width: '100%',
 	                format: '%s',
 	                showLabels: false,
 	                showScale: false,
 	                isRange : true,
-	                // scale : time,
 	                theme: "theme-blue",
 	                ondragend: function(){
 	                	temp = $('.slider').val().split(',');
-        				document.getElementById("starttime").innerHTML = transfer(time[parseInt(temp[0]) - 1]);
-        				document.getElementById("endtime").innerHTML = transfer(time[parseInt(temp[1]) - 1]);
+	                	current = parseInt(temp[0]);
+	                	target = parseInt(temp[1]);
+	                	updateTimes();
         			}
 	            });
-        			$('.slider').jRange('updateRange', '1,' + time.length, '1,' + time.length);
 	        }
 
 		</script>
